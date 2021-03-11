@@ -2,15 +2,27 @@
  * @Author: maggot-code
  * @Date: 2021-02-28 16:23:18
  * @LastEditors: maggot-code
- * @LastEditTime: 2021-03-01 09:59:12
+ * @LastEditTime: 2021-03-11 09:48:38
  * @Description: config options
  */
 const resolves = dir => require('path').join(__dirname, dir);
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin');
+const CompressionWebpackPlugin = require('compression-webpack-plugin');
 
-const pluginList = [];
+const pluginList = [
+    new LodashModuleReplacementPlugin(),
+    new CompressionWebpackPlugin({
+        filename: info => `${info.path}.gz${info.query}`,
+        algorithm: 'gzip',
+        threshold: 10240 * 10, // 只有大小大于该值的资源会被处理 10240
+        test: new RegExp('\\.(' + ['js', 'css', 'json'].join('|') + ')$'),
+        minRatio: 0.8, // 只有压缩率小于这个值的资源才会被处理
+        deleteOriginalAssets: false // 删除原文件
+    })
+];
 
-const options = {
+const OPTIONS = {
     publicPath: './',
     outputDir: 'dist',
     assetsDir: 'static',
@@ -19,6 +31,19 @@ const options = {
         // 查看CSS属于哪个css文件
         sourceMap: process.env.NODE_ENV === 'development',
         extract: true
+    },
+    devServer: {
+        https: false,
+        open: false,
+        proxy: {
+            '/api/v1': {
+                target: 'http://127.0.0.1:8848',
+                ws: true,
+                secure: false,
+                changeOrigin: true,
+                pathReWrite: { '^/api/v1': '' }
+            }
+        }
     },
     chainWebpack: config => {
         config.resolve.alias.set('@', resolves('src'));
@@ -70,4 +95,4 @@ const options = {
     }
 };
 
-module.exports = options;
+module.exports = OPTIONS;
