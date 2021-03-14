@@ -2,7 +2,7 @@
  * @Author: maggot-code
  * @Date: 2021-02-28 16:23:18
  * @LastEditors: maggot-code
- * @LastEditTime: 2021-03-11 09:48:38
+ * @LastEditTime: 2021-03-12 15:32:08
  * @Description: config options
  */
 const resolves = dir => require('path').join(__dirname, dir);
@@ -37,7 +37,7 @@ const OPTIONS = {
         open: false,
         proxy: {
             '/api/v1': {
-                target: 'http://127.0.0.1:8848',
+                target: process.env.VUE_APP_BASE_URL,
                 ws: true,
                 secure: false,
                 changeOrigin: true,

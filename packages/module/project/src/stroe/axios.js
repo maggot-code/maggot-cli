@@ -2,10 +2,19 @@
  * @Author: maggot-code
  * @Date: 2021-03-11 15:54:54
  * @LastEditors: maggot-code
- * @LastEditTime: 2021-03-11 16:09:15
+ * @LastEditTime: 2021-03-14 23:51:14
  * @Description: store inlet
  */
 import { filter } from 'lodash';
+
+const screenId = (baseKeysList) => {
+    const keysList = [];
+    for (const iterator of baseKeysList) {
+        keysList.push(iterator);
+    }
+
+    return keysList;
+}
 
 export const state = {
     requestQueue: new Map()
@@ -19,49 +28,64 @@ export const mutations = {
      * @param {Object} member 入列成员对象
      */
     addRequestQueue(state, member) {
-        console.log(member);
         const {
+            url,
             requestId,
             requestTag,
-            cancelToken
+            cancelFunc
         } = member;
 
-        state.requestQueue.set({ requestId, requestTag }, cancelToken);
+        state.requestQueue.set({ requestId, requestTag }, {
+            url,
+            requestId,
+            requestTag,
+            func: cancelFunc
+        });
     },
 
     removeRequestQueue(state, memberId) {
-        const baseKeysList = state.requestQueue.keys();
+        const find = filter(screenId(state.requestQueue.keys()), (member) => member.requestId === memberId);
 
-        const keysList = [];
-        for (const iterator of baseKeysList) {
-            keysList.push(iterator);
-        }
-
-        const find = filter(keysList, (member) => member.requestId === memberId);
         if (find.length <= 0) {
             return false;
         }
 
-        const cancelFunc = state.requestQueue.has(find[0]);
-        if (!cancelFunc) {
+        state.requestQueue.has(find[0]) && state.requestQueue.delete(find[0]);
+    },
+
+    cancelTagRequest(state, memberTag) {
+        const queue = filter(screenId(state.requestQueue.keys()), (member) => member.requestTag === memberTag);
+
+        if (queue.length <= 0) {
             return false;
         }
 
-        state.requestQueue.get(find[0])({
-            data: {},
-            headers: {},
-            status: 200,
-            statusText: "OK"
-        });
+        queue.forEach(cell => {
+            const target = state.requestQueue.has(cell);
 
-        state.requestQueue.delete(find[0]);
+            if (target) {
+                const { url, requestId, requestTag, func } = state.requestQueue.get(cell);
+                func.url = url;
+                func({
+                    url,
+                    requestId,
+                    requestTag,
+                    msg: `cancel request ${memberTag}`,
+                });
+
+                state.requestQueue.delete(cell);
+            }
+        });
     }
 }
 export const actions = {
     _addRequestQueue({ commit }, member) {
         commit('addRequestQueue', member);
     },
-    _removeRequestQueue({ commit }, memberId = null) {
+    _removeRequestQueue({ commit }, memberId = '') {
         commit('removeRequestQueue', memberId)
+    },
+    _cancelTagRequest({ commit }, tag = 'default') {
+        commit('cancelTagRequest', tag);
     }
 }

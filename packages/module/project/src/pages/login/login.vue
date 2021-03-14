@@ -2,7 +2,7 @@
  * @Author: maggot-code
  * @Date: 2021-03-02 18:00:38
  * @LastEditors: maggot-code
- * @LastEditTime: 2021-03-11 14:24:37
+ * @LastEditTime: 2021-03-15 00:01:17
  * @Description: mg-login.vue
 -->
 <template>
@@ -10,7 +10,6 @@
 </template>
 
 <script>
-import { ping } from "@/api/test.api";
 export default {
     name: "mg-login",
     mixins: [],
@@ -27,11 +26,7 @@ export default {
     //方法集合
     methods: {},
     //生命周期 - 创建完成（可以访问当前this实例）
-    created() {
-        ping({
-            a: 11,
-        });
-    },
+    created() {},
     //生命周期 - 挂载完成（可以访问DOM元素）
     mounted() {},
     beforeCreate() {}, //生命周期 - 创建之前

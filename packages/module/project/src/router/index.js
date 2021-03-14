@@ -2,7 +2,7 @@
  * @Author: maggot-code
  * @Date: 2021-03-11 12:42:36
  * @LastEditors: maggot-code
- * @LastEditTime: 2021-03-11 12:50:12
+ * @LastEditTime: 2021-03-14 22:49:36
  * @Description: application router inlet
  */
 import Vue from 'vue';
@@ -20,12 +20,7 @@ const router = new VueRouter({
         ...powerMap,
         {
             path: "*",
-            name: "404",
-            meta: {
-                title: "404",
-                power: false
-            },
-            component: () => import('@/pages/not-page')
+            redirect: '/404'
         }
     ],
     basetitle: process.env.VUE_APP_TITLE,
